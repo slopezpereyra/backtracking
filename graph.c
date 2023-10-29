@@ -4,6 +4,10 @@
 #include <stdbool.h>
 
 
+/**
+ * Allocates memory for new _node, sets its value to `value` and 
+ * returns pointer to _node.
+ */
 node createNewNode(int value){
     node vertex = (node) malloc(sizeof(struct _node));
     vertex -> value = value;
@@ -71,21 +75,35 @@ void printGraph(graph g) {
     }
 }
 
-// Recursive function that determines if path exists 
-// from node `from` to `to` with constraint of not walking 
-// through NULL nodes.
-bool pathExists(graph g, int from, int to){
-    if (from == to) { return(true); }
+// Recursive function that determines if path exists
+// from node `from` to `to` with constraint of not walking
+// through NULL nodes. May or may not impose hamiltonian constraint.
+bool pathExists(graph g, int from, int to, bool hamiltonian){
+    if (from == to){
+        if (!hamiltonian) { return true; }
+        return (countTraversedNodes(g) == ( g -> V ) - 1);
+    } 
     if (getNode(g, to) == NULL) { return(false); }
 
     node node_from = getNode(g, from), node_to = getNode(g, to);
     bool exists = false;
     for (node vertex = node_to; vertex != NULL; vertex = vertex -> next){
         graph copy = cloneGraphWithoutNode(g, to);
-        exists = exists || pathExists(copy, from, vertex -> value);
+        exists = exists || pathExists(copy, from, vertex -> value, hamiltonian);
         destroyGraph(copy); // clean memory from copy once it is done;
     }
+    if (exists) {  printf("%d <-- ", to);}
     return(exists);
+}
+
+// 
+int countTraversedNodes(graph g){
+    int nulls = 0;
+    for (int i = 0; i < g -> V; i++){
+        if ((g -> adj_l)[i] == NULL ){
+            nulls = nulls + 1;
+        }
+    }return(nulls);
 }
 
 graph cloneGraphWithoutNode(graph original, int removeIndex) {

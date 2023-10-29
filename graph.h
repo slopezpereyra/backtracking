@@ -25,6 +25,9 @@ node getNode(graph g, int i);
 
 graph cloneGraphWithoutNode(graph original, int removeIndex);
 
-bool pathExists(graph g, int from, int to);
+bool pathExists(graph g, int from, int to, bool hamiltonian);
+bool hamPathExists(graph g, int from, int to);
+
+int countTraversedNodes(graph g);
 
 void destroyGraph(graph g);
