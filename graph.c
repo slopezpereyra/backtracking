@@ -3,62 +3,6 @@
 #include "graph.h"
 #include <stdbool.h>
 
-void dump_list(list l){
-    while (l != NULL){
-        printf("%d -> ", l -> value);
-        l = l -> next;
-    }printf("\n");
-}
-
-int llength(list l){
-    int n = 0;
-    while (l != NULL){
-        n = n + 1;
-        l = l -> next;
-    }
-    return(n);
-}
-
-bool list_has(list l, int x){
-    bool has = (l -> value) == x;
-    while(l -> next != NULL && !has){
-        l = l -> next;
-        has = (l -> value) == x;
-    }
-    return(has);
-}
-
-list append(list l, node n){
-    if (l == NULL){
-        return(n);
-    }
-    node aux = l;
-    while (aux -> next != NULL){
-        aux = aux -> next;
-    }
-    aux -> next = n;
-    return(l);
-}
-
-list del(list l, int x){
-    if (!list_has(l, x)){
-        return(l);
-    }
-    node laux = l;
-    if (laux -> value == x){
-        laux = laux -> next;
-        free(l);
-        return(laux);
-    }
-
-    while ((laux -> next) -> value != x){
-        laux = laux -> next;
-    }
-    node _laux  = laux; 
-    _laux -> next = (_laux -> next) -> next;
-    free(laux -> next);
-    return(l);
-}
 
 node createNewNode(int value){
     node vertex = (node) malloc(sizeof(struct _node));
@@ -134,6 +78,10 @@ void removeVertex(graph g, int i){
     (g -> adj_l)[i] = NULL;
 }
 
+node get_ith_node(graph g, int i){
+    return( (g -> adj_l)[i] );
+}
+
 // Function to print the adjacency list
 void printGraph(graph g) {
     for (int i = 0; i < g->V; i++) {
@@ -146,5 +94,30 @@ void printGraph(graph g) {
         printf("NULL\n");
     }
 }
+
+// Recursive function that determines if path exists 
+// from node `from` to `to` with constraint of not walking 
+// through NULL nodes.
+bool pathExists(graph g, int from, int to){
+    if (from == to) { return(true); }
+    if (get_ith_node(g, to) == NULL) { return(false); }
+
+    node node_from = get_ith_node(g, from), node_to = get_ith_node(g, to);
+    bool exists = false;
+    for (node vertex = node_to; vertex != NULL; vertex = vertex -> next){
+        graph copy = cloneGraphWithoutNode(g, to);
+        exists = exists || pathExists(copy, from, vertex -> value);
+        free(copy); // clean memory from copy once it is done;
+    }
+    return(exists);
+}
+
+
+
+
+
+
+
+
 
 

@@ -2,15 +2,7 @@
 #include <stdlib.h> 
 #include "graph.h"
 #include <stdbool.h>
-
-typedef list vertex;
-
-//graph subGraph(graph g, int vertex){
-//    graph sub_graph = createGraph(g -> V - 1);
-//    for (int i = 0; i < g; )
-//}
-//
-
+#include <time.h>
 
 int findMinimum(int arr[], size_t size) {
     if (size == 0) {
@@ -38,38 +30,40 @@ bool are_all_null(graph g, int except){
     return(true);
 }
 
-bool can_be_solved(graph g, int start){
+bool can_be_solved(graph g, int current_node){
+    node zero_node = (g -> adj_l)[0];
 
-    node neighbors = (g -> adj_l)[start];
-    for (node neigh = neighbors; neigh != NULL; neigh = neigh -> next){
-        if ((g -> adj_l)[neigh -> value] == NULL){
+    for (int i = 1; i < g -> V; i++){
+        if (i == current_node || (g -> adj_l)[i] == NULL){
             continue;
-        }if (list_has((g -> adj_l)[neigh -> value], 0)){
-            return(true);
+        }
+        node vertex = get_ith_node(g, i);
+        if (list_has(vertex, 0)){
+            if (pathExists(g, current_node, i)){
+                return(true);
+            }
         }
     }
-
     return(false);
 }
 
-int hamiltonian_cycle(graph g, int start){
-    printf("\n---------------------------------------------------------\n");
-    printGraph(g);
-    list candidates = (g -> adj_l)[start];
-//    if (!can_be_solved(g, start)){
-//        printf("Cannot be solved; returning inf... \n");
-//        return(1000000);
-//    }
 
+int hamiltonian_cycle(graph g, int start){
+    
     if (are_all_null(g, start)){
-        printf("******************* NULL EVEN ***************\n");
         if (list_has((g -> adj_l)[start], 0)){
             return(1);
         }else{
-            printf("Ret inf\n");
             return(1000000);
         }
     }
+    // This makes the algorithm a backtracking one.
+    // Remove this caluse and the algorithm is greedy.
+    if (!can_be_solved(g, start)){
+        return(1000000);
+    }
+    
+    list candidates = (g -> adj_l)[start];
     int n = llength(candidates);
     int solutions[n];
     int i = 0;
@@ -77,11 +71,10 @@ int hamiltonian_cycle(graph g, int start){
         if ((g -> adj_l)[v -> value] == NULL){
             continue;
         }
-        printf("Taking path %d -> %d\n", start, v -> value);
         graph subgraph = cloneGraphWithoutNode(g, start);
         solutions[i] = 1 + hamiltonian_cycle(subgraph, v -> value);
         i = i+1;
-    }    
+    }
     return(findMinimum(solutions, n));
 }
 
@@ -89,16 +82,30 @@ int hamiltonian_cycle(graph g, int start){
 
 // Driver code
 int main() {
-    int V = 5;
+    int V = 6;
     graph g = createGraph(V);
     addEdge(g, 0, 1);
     addEdge(g, 0, 2);
-    addEdge(g, 1, 3);
+    addEdge(g, 0, 3);
+    addEdge(g, 1, 2);
+    addEdge(g, 1, 4);
+    addEdge(g, 1, 5);
+    addEdge(g, 2, 3);
     addEdge(g, 2, 4);
     addEdge(g, 3, 4);
-    printGraph(g);
+    addEdge(g, 4, 5);
+
+    clock_t start_time, end_time;
+    start_time = clock(); // Record the start time
+
+    // Your algorithm or code to measure here = 0.000467
+    //                                          0.00036
+
+    double cpu_time_used;
+
     int sol = hamiltonian_cycle(g, 0);
     printf("Solution is %d\n", sol);
+    end_time = clock(); // Record the end time
+    cpu_time_used = ((double)(end_time - start_time)) / CLOCKS_PER_SEC;
+    printf("Time taken: %f seconds\n", cpu_time_used);
 }
-
-
