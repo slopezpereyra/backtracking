@@ -53,32 +53,8 @@ void removeEdge(graph g, int a, int b){
     (g -> adj_l)[b] = del((g -> adj_l)[b], a);
 }
 
-graph cloneGraphWithoutNode(graph original, int removeIndex) {
-    if (original == NULL || removeIndex < 0 || removeIndex >= original->V) {
-        // Handle invalid input or NULL graph.
-        return NULL;
-    }
 
-    int n = original->V; // The new number of vertices
-    graph newGraph = createGraph(n);
-
-    for (int i = 0 ; i < original->V; i++) {
-        if (i == removeIndex) {
-            // Skip the removed vertex
-            continue;
-        }
-        list l = (original -> adj_l)[i];
-        (newGraph -> adj_l)[i] = l;
-    }
-
-    return newGraph;
-}
-
-void removeVertex(graph g, int i){
-    (g -> adj_l)[i] = NULL;
-}
-
-node get_ith_node(graph g, int i){
+node getNode(graph g, int i){
     return( (g -> adj_l)[i] );
 }
 
@@ -100,24 +76,49 @@ void printGraph(graph g) {
 // through NULL nodes.
 bool pathExists(graph g, int from, int to){
     if (from == to) { return(true); }
-    if (get_ith_node(g, to) == NULL) { return(false); }
+    if (getNode(g, to) == NULL) { return(false); }
 
-    node node_from = get_ith_node(g, from), node_to = get_ith_node(g, to);
+    node node_from = getNode(g, from), node_to = getNode(g, to);
     bool exists = false;
     for (node vertex = node_to; vertex != NULL; vertex = vertex -> next){
         graph copy = cloneGraphWithoutNode(g, to);
         exists = exists || pathExists(copy, from, vertex -> value);
-        free(copy); // clean memory from copy once it is done;
+        destroyGraph(copy); // clean memory from copy once it is done;
     }
     return(exists);
 }
 
+graph cloneGraphWithoutNode(graph original, int removeIndex) {
 
+    int n = original->V;
+    graph newGraph = createGraph(n);
 
+    for (int i = 0 ; i < original->V; i++) {
+        if (i == removeIndex) {
+            // Skip the removed vertex
+            continue;
+        }
+        list original_node = (original -> adj_l)[i];
+        if (original_node == NULL){
+            continue;
+        }
+        node new_node = createNewNode(i);
+        (newGraph -> adj_l)[i] = append( (newGraph -> adj_l)[i], new_node );
+        *(newGraph -> adj_l)[i] = *original_node;
+    }
+    return newGraph;
+}
 
+void destroyGraph(graph g){
 
-
-
-
+    for (int i = 0 ; i < g -> V; i++) {
+         free( (g -> adj_l)[i] );
+         (g -> adj_l)[i] = NULL;
+    }
+    free( g -> adj_l );
+    ( g -> adj_l ) = NULL;
+    free(g);
+    g = NULL;
+}
 
 

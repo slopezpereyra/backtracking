@@ -6,7 +6,7 @@
 
 struct _graph {
     int V;
-    node *adj_l; // pointer to a pointer to node
+    list *adj_l; // pointer to a list (which is a pointer to _node).
 };
 
 typedef struct _graph * graph;
@@ -21,8 +21,10 @@ void printGraph(graph g);
 
 node createNewNode(int value);
 
-node get_ith_node(graph g, int i);
+node getNode(graph g, int i);
 
 graph cloneGraphWithoutNode(graph original, int removeIndex);
 
 bool pathExists(graph g, int from, int to);
+
+void destroyGraph(graph g);
