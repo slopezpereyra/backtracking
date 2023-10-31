@@ -52,12 +52,10 @@ void addEdge(graph g, int a, int b){
     (g -> adj_l)[b] = append((g -> adj_l)[b], new);
 }
 
-void removeEdge(graph g, int a, int b){
-    (g -> adj_l)[a] = del((g -> adj_l)[a], b);
-    (g -> adj_l)[b] = del((g -> adj_l)[b], a);
-}
-
-
+/*
+ * Wrapper function to get the pointer to the `i`th vertex 
+ * in a graph.
+ */
 node getNode(graph g, int i){
     return( (g -> adj_l)[i] );
 }
@@ -96,7 +94,12 @@ bool pathExists(graph g, int from, int to, bool hamiltonian){
     return(exists);
 }
 
-// 
+/*
+ * Counts how many vertices are NULL. Since a vertex is set to NULL iff 
+ * it was traversed in a path finding function (e.g. pathExists), this 
+ * amounts to counting the number of vertices that were traversed in the 
+ * context of a path search.
+ */
 int countTraversedNodes(graph g){
     int nulls = 0;
     for (int i = 0; i < g -> V; i++){
@@ -106,20 +109,20 @@ int countTraversedNodes(graph g){
     }return(nulls);
 }
 
-graph cloneGraphWithoutNode(graph original, int removeIndex) {
+/*
+ * Returns a deep copy of graph `original` except for a specific vertex, 
+ * which is set to NULL.
+ */
+graph cloneGraphWithoutNode(graph original, int remove) {
 
-    int n = original->V;
-    graph newGraph = createGraph(n);
+    graph newGraph = createGraph( original -> V );
 
     for (int i = 0 ; i < original->V; i++) {
-        if (i == removeIndex) {
-            // Skip the removed vertex
+        if (i == remove || (original -> adj_l)[i] == NULL) {
+            // Skip the removed vertex or null vertex
             continue;
         }
         list original_node = (original -> adj_l)[i];
-        if (original_node == NULL){
-            continue;
-        }
         node new_node = createNewNode(i);
         (newGraph -> adj_l)[i] = append( (newGraph -> adj_l)[i], new_node );
         *(newGraph -> adj_l)[i] = *original_node;
@@ -127,6 +130,11 @@ graph cloneGraphWithoutNode(graph original, int removeIndex) {
     return newGraph;
 }
 
+/*
+ * Frees all memory allocated for a given graph. This means the memory
+ * allocated to store the edges of each vertex is also freed. All pointers
+ * are set to NULL.
+ */
 void destroyGraph(graph g){
 
     for (int i = 0 ; i < g -> V; i++) {

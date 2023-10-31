@@ -5,7 +5,10 @@
 #include <time.h>
 
 
-int hamCycle(graph g, int start){
+/*
+ * Determines if there is a Hamiltonian cycle for graph `g`.
+ */
+int hamCycle(graph g){
 
     list firstNeighbor = (g -> adj_l)[0];
     if (firstNeighbor == NULL || firstNeighbor -> next == NULL) { return false; }
@@ -49,7 +52,7 @@ int main() {
     clock_t start_time, end_time;
     start_time = clock(); // Record the start time
     double cpu_time_used;
-    int sol = hamCycle(g, 0);
+    int sol = hamCycle(g);
     printf("\n");
     printf("Solution is %d\n", sol);
     end_time = clock(); // Record the end time
