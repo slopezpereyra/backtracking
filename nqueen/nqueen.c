@@ -1,10 +1,18 @@
 #include <stdio.h> 
 #include <stdlib.h> 
-#include "board.h"
 #include <assert.h>
 #include <stdbool.h>
 
+// Struct with 8x8 array as only field.
+struct _board {
+    int matrix[8][8];
+};
 
+typedef struct _board * board;
+
+/* Initializes an empty board 
+ * with all entries equal to zero.
+ */
 board initBoard(){
     board b = (board) malloc(sizeof(struct _board));
     for (int i = 0; i < 8; i++){
@@ -15,23 +23,38 @@ board initBoard(){
     return b;
 }
 
+/* Determines whether a queen is placed at coordinate (x, y) of a 
+ * board.
+ */
+int hasQueen(board b, int x, int y){
+    return ( (b -> matrix)[x][y] == 8 );
+}
+
+/* Makes deep copy of a board.
+ */
 board copyBoard(board b){
     board clone = (board) malloc(sizeof(struct _board));
     *clone = *b;
     return(clone);
 }
 
+/* Sets coordinate (x, y) of a board to 1.
+ */
 void toggle(board b, int x, int y){
     assert(x < 8 && y < 8);
-    if (isQueen(b, x, y)) { return; }
+    if (hasQueen(b, x, y)) { return; }
     (b -> matrix)[x][y] = 1;
 }
 
+/* Sets coordinate (x, y) of a board to 8, where 8 represents a queen.
+ */
 void markForQueen(board b, int x, int y){
     assert(x < 8 && y < 8);
     (b -> matrix)[x][y] = 8;
 }
 
+/* Prints the matrix of a board.
+ */
 void dumpBoard(board b){
     for (int i = 0; i < 8; i++){
         for (int j = 0; j < 8; j ++){
@@ -40,6 +63,8 @@ void dumpBoard(board b){
     }printf("\n");
 }
 
+/* Sets all entries in xth column to one.
+ */
 void toggleCol(board b, int x){
     assert(x < 8);
     for (int i = 0; i < 8; i++){
@@ -47,11 +72,8 @@ void toggleCol(board b, int x){
     }
 }
 
-bool isQueen(board b, int x, int y){
-    return ( (b -> matrix)[x][y] == 8 );
-}
-
-
+/* Sets all entries in yth row to one.
+ */
 void toggleRow(board b, int y){
     assert(y < 8);
     for (int i = 0; i < 8; i++){
@@ -59,6 +81,9 @@ void toggleRow(board b, int y){
     }
 }
 
+/* Finds the diagonal that passes through (x, y) from left to right
+ * and sets all its entries to 1.
+ */
 void toggleDiag(board b, int x, int y){
     assert(x < 8 && y < 8);
     int d = y - x, x_start, y_start;
@@ -73,6 +98,9 @@ void toggleDiag(board b, int x, int y){
     }
 }
 
+/* Finds the diagonal that passes through (x, y) from right to left
+ * and sets all its entries to 1.
+ */
 void toggleDiagB(board b, int x, int y){
     int x_start, y_start;
     if (x + y >= 7){
@@ -89,6 +117,9 @@ void toggleDiagB(board b, int x, int y){
     }
 }
 
+/* Sets (x, y) to 8; the entries of the row, column and diagonals passing
+ * through (x, y) are all set to 1.
+ */
 void placeQueen(board b, int x, int y){
     assert(x < 8 && y < 8);
     toggleCol(b, x);
@@ -98,8 +129,8 @@ void placeQueen(board b, int x, int y){
     markForQueen(b, x, y);
 }
 
-
-
+/* Determines if there is place for another queen in a given board.
+ */
 bool canBeSolved(board b){
     for (int i = 0; i < 8; i++){
         for (int j = 0; j < 8; j ++){
@@ -111,6 +142,8 @@ bool canBeSolved(board b){
     return(false);
 }
 
+/* Determines the number of queens in a board.
+ */
 int queenCount(board b){
     int n = 0;
     for (int i = 0; i < 8; i++){
@@ -123,38 +156,38 @@ int queenCount(board b){
     return(n);
 }
 
-bool nQueen(board b){
+/* Frees memory of a board and sets its pointer to null.
+ */
+void destroyBoard(board b){
+    free(b);
+    b = NULL;
+}
+
+/* Backtracking algorithm. Finds and prints all arrangements of eight queens in
+ * an 8x8 board s.t. no queen attacks another.
+ */
+void nQueen(board b){
     if (queenCount(b) == 8){
         dumpBoard(b);
-        return(true);
+        return;
     }
     if (!canBeSolved(b)){
-        return(false);
+        return;
     }
-
-    bool solved = false;
 
     for (int i = 0; i < 8; i++){
         for (int j = 0; j < 8; j ++){
             if((b -> matrix)[i][j] == 0){
                 board subBoard = copyBoard(b);
                 placeQueen(subBoard, i, j);
-                solved = true && nQueen(subBoard);
-                if (solved) { dumpBoard(b);  return(true); } // early stop
+                nQueen(subBoard);
+                destroyBoard(subBoard);
             }
         }
     }
-    return(solved);
 }
 
 int main(){
     board b = initBoard();
-//    dumpBoard(b);
-//    printf("Solvable : %d \n", canBeSolved(b));
-//    placeQueen(b, 0, 0);
-//    dumpBoard(b);
-//    printf("Solvable : %d \n", canBeSolved(b));
     nQueen(b);
-//
-
 }
