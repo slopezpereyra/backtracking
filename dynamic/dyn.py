@@ -1,4 +1,5 @@
 import numpy as np
+import random
 
 # Binomial coefficient 
 
@@ -114,8 +115,46 @@ def max_gain_bounded_cost(M, D, C, K):
 
     return(R[n][C][K])
 
-print(max_gain_bounded_cost_rec([5, 10, 15, 20], [6, 7, 1, 9], 200, 0, 3))
-print(max_gain_bounded_cost([5, 10, 15, 20], [6, 7, 1, 9], 200, 9))
+
+BOARD = [[random.randint(-3, 9) for _ in range(9)] for _ in range(9)]
+print(np.matrix(BOARD))
+def traveller_rec(i, j, s):
+
+    if i > 8 or j > 8:
+        return(0)
+
+    if s < 0 or j < 0:
+        return(np.NINF)
+
+    return max(
+            BOARD[i][j] + traveller_rec(i + 1, j, s + BOARD[i][j]),
+            BOARD[i][j] + traveller_rec(i + 1, j + 1, s + BOARD[i][j]),
+            BOARD[i][j] + traveller_rec(i + 1, j - 1, s + BOARD[i][j])
+            )
+
+# Assume a matrix A of 9×9 dimensions. 
+#
+#               {   0                                       i > 9
+#  f(i, j, s) = { -∞                                        s < 0 ∨ j < 0
+#               {  max ( Aᵢⱼ + f(i + 1, j, s + Aᵢⱼ),
+#               {        Aᵢⱼ + f(i + 1, j + 1, s + Aᵢⱼ)     otherwise
+#               {        Aᵢⱼ + f(i + 1, j - 1, s + Aᵢⱼ) 
+#       
+
+def traveller():
+   
+    C = [[0 for _ in range(10)] for _ in range(10)]
+
+
+
+
+
+
+print(traveller_rec(0, 2, 0))
+
+
+#print(max_gain_bounded_cost_rec([5, 10, 15, 20], [6, 7, 1, 9], 200, 0, 3))
+#print(max_gain_bounded_cost([5, 10, 15, 20], [6, 7, 1, 9], 200, 9))
 
 
 
