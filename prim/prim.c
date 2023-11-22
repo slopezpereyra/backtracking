@@ -6,24 +6,9 @@
 
 
 /*
- * Determines if there is a Hamiltonian cycle for graph `g`.
+ * Finds shortest generating tree
  */
-int hamCycle(graph g){
 
-    list firstNeighbor = (g -> adj_l)[0];
-    if (firstNeighbor == NULL || firstNeighbor -> next == NULL) { return false; }
-    // Exclude 'root' from path finding
-    (g -> adj_l)[0] = NULL;
-    for (node zn = firstNeighbor -> next; zn != NULL; zn = zn -> next){
-        if (pathExists(g, zn -> value, firstNeighbor -> value, true)){
-            return(true);
-            destroyGraph(g);
-        }
-
-    }
-    destroyGraph(g);
-    return(false);
-}
 
 
 
@@ -40,15 +25,6 @@ int main() {
     addEdge(g, 1, 5);
     addEdge(g, 5, 2);
     addEdge(g, 3, 4);
-    //addEdge(g, 0, 1);
-    //addEdge(g, 1, 2);
-    //addEdge(g, 2, 3);
-    //addEdge(g, 3, 4);
-    //addEdge(g, 4, 5);
-    //addEdge(g, 2, 4);
-    //addEdge(g, 1, 5);
-    //addEdge(g, 5, 2);
-
     clock_t start_time, end_time;
     start_time = clock(); // Record the start time
     double cpu_time_used;
@@ -59,3 +35,4 @@ int main() {
     cpu_time_used = ((double)(end_time - start_time)) / CLOCKS_PER_SEC;
     printf("Time taken: %f seconds\n", cpu_time_used);
 }
+

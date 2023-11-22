@@ -86,9 +86,9 @@ void toggleRow(board b, int y){
  */
 void toggleDiag(board b, int x, int y){
     assert(x < 8 && y < 8);
-    int d = y - x, x_start, y_start;
-    if (d >= 0){ y_start = d; x_start = 0; }
-    else{ y_start = 0; x_start = d * (-1); }
+    int x_start, y_start;
+    if (y >= x){ y_start = y - x; x_start = 0; }
+    else{ y_start = 0; x_start = x - y; }
     for (int i = 0; i < 8; i++){
         if (x_start > 7 || y_start > 7){
             break;
@@ -166,28 +166,33 @@ void destroyBoard(board b){
 /* Backtracking algorithm. Finds and prints all arrangements of eight queens in
  * an 8x8 board s.t. no queen attacks another.
  */
-void nQueen(board b){
+bool nQueen(board b, int x, int y){
+    placeQueen(b, x, y);
     if (queenCount(b) == 8){
         dumpBoard(b);
-        return;
+        return(true);
     }
     if (!canBeSolved(b)){
-        return;
+        return(false);
     }
 
+    bool solved = false;
     for (int i = 0; i < 8; i++){
         for (int j = 0; j < 8; j ++){
             if((b -> matrix)[i][j] == 0){
                 board subBoard = copyBoard(b);
-                placeQueen(subBoard, i, j);
-                nQueen(subBoard);
+                solved = nQueen(subBoard, i, j);
                 destroyBoard(subBoard);
+                if (solved) { return(true); }
             }
         }
-    }
+    }return(false);
 }
+
 
 int main(){
     board b = initBoard();
-    nQueen(b);
+    nQueen(b, 5, 3);
+    board b2 = initBoard();
+    nQueen(b2, 0, 0);
 }
