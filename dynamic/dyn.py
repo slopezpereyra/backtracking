@@ -116,15 +116,15 @@ def max_gain_bounded_cost(M, D, C, K):
     return(R[n][C][K])
 
 
-BOARD = [[random.randint(-3, 9) for _ in range(9)] for _ in range(9)]
-print(np.matrix(BOARD))
+BOARD = [[random.randint(-9, 9) for _ in range(4)] for _ in range(4)]
 def traveller_rec(i, j, s):
 
-    if i > 8 or j > 8:
-        return(0)
-
-    if s < 0 or j < 0:
+    n = len(BOARD[1])
+    if  j < 0 or j >= n or s + BOARD[i][j] < 0:
         return(np.NINF)
+    
+    if i == n - 1:
+        return(BOARD[i][j]) 
 
     return max(
             BOARD[i][j] + traveller_rec(i + 1, j, s + BOARD[i][j]),
@@ -132,25 +132,29 @@ def traveller_rec(i, j, s):
             BOARD[i][j] + traveller_rec(i + 1, j - 1, s + BOARD[i][j])
             )
 
-# Assume a matrix A of 9×9 dimensions. 
-#
-#               {   0                                       i > 9
-#  f(i, j, s) = { -∞                                        s < 0 ∨ j < 0
-#               {  max ( Aᵢⱼ + f(i + 1, j, s + Aᵢⱼ),
-#               {        Aᵢⱼ + f(i + 1, j + 1, s + Aᵢⱼ)     otherwise
-#               {        Aᵢⱼ + f(i + 1, j - 1, s + Aᵢⱼ) 
-#       
-
 def traveller():
-   
-    C = [[0 for _ in range(10)] for _ in range(10)]
+    
+    n = len(BOARD[1])
+    C = [[np.NINF for _ in range(n)] for _ in range(n)]
+
+    for i in range(n):
+        C[n - 1][i] = BOARD[n - 1][i]
+
+    for i in range(n - 2, -1, -1):
+        for j in range(n):
+            next_row, v = C[i + 1], BOARD[i][j]
+            up = v + next_row[j] if v + next_row[j] >= 0 else np.NINF
+            upr = v + next_row[j + 1] if j + 1 < n and v + next_row[j+1] >= 0 else np.NINF
+            upl = v + next_row[j - 1] if j - 1 >= 0 and v + next_row[j-1] >= 0  else np.NINF
+            C[i][j] = max(up, upr, upl)
+
+    return(np.matrix(C))
 
 
-
-
-
-
+print(np.matrix(BOARD))
+print("\n")
 print(traveller_rec(0, 2, 0))
+print(traveller())
 
 
 #print(max_gain_bounded_cost_rec([5, 10, 15, 20], [6, 7, 1, 9], 200, 0, 3))
